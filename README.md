@@ -4,6 +4,10 @@ To start the backend run:
 ```Bash
 cd backend && ./mvnw spring-boot:run
 ```
+To install frontend dependencies run:
+```Bash
+cd frontend && npm install
+```
 
 To start the frontend run:
 ```Bash
