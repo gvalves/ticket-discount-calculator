@@ -1,78 +1,82 @@
-package br.geekcode.ticketdiscountcalculator.services.impl;
+package br.geekcode.ticketdiscountcalculator.services.ticket.discount.impl;
 
-import br.geekcode.ticketdiscountcalculator.models.Client;
-import br.geekcode.ticketdiscountcalculator.services.TicketDiscountService;
+import br.geekcode.ticketdiscountcalculator.enums.ClientProfile;
+import br.geekcode.ticketdiscountcalculator.models.client.Client;
+import br.geekcode.ticketdiscountcalculator.services.ticket.discount.TicketDiscountService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.time.LocalDate;
+import java.lang.reflect.Field;
+
+import static org.mockito.Mockito.*;
 
 @SpringBootTest
-public class TicketDiscountServiceImplTest {
+public class TicketDiscountServiceBaseTest {
     @Autowired
+    @Qualifier("ticketDiscountServiceBase")
     private TicketDiscountService ticketDiscountService;
 
-    private Client createClientWithNoneProfile() {
-        Client client = new Client();
-        client.setBirthday(LocalDate.now().minusYears(20));
-        return client;
-    }
+    public Client createClientMock() {
+        var clientMock = mock(Client.class);
 
-    private void setClientProfileToChild(Client client) {
-        client.setBirthday(LocalDate.now().minusYears(5));
-        client.setStudent(false);
-        client.setStudentCard(false);
-    }
+        doAnswer(invocation -> {
+            ClientProfile profile = invocation.getArgument(0);
 
-    private void setClientProfileToStudent(Client client) {
-        client.setBirthday(LocalDate.now().minusYears(20));
-        client.setStudent(true);
-        client.setStudentCard(false);
-    }
+            Field field = Client.class.getDeclaredField("profile");
+            field.setAccessible(true);
+            field.set(clientMock, profile);
 
-    private void setClientProfileToStudentWithCard(Client client) {
-        client.setBirthday(LocalDate.now().minusYears(20));
-        client.setStudent(true);
-        client.setStudentCard(true);
-    }
+            return null;
+        }).when(clientMock).setProfile(any(ClientProfile.class));
 
-    private void setClientProfileToElder(Client client) {
-        client.setBirthday(LocalDate.now().minusYears(70));
-        client.setStudent(false);
-        client.setStudentCard(false);
+        doAnswer(invocation -> {
+            Field field = Client.class.getDeclaredField("profile");
+            field.setAccessible(true);
+            return field.get(clientMock);
+        }).when(clientMock).getProfile();
+
+        clientMock.setProfile(ClientProfile.NONE);
+
+        return clientMock;
     }
 
     @Test
     @DisplayName("calculateTicketPriceForMonday should return 8 if client has no discount")
     public void calculateTicketPriceForMonday_Should_Return_Eight_If_Client_Has_No_Discount() {
-        Client client = createClientWithNoneProfile();
-        double price = ticketDiscountService.calculateTicketPriceForMonday(client);
-
+        var client = createClientMock();
+        var price = ticketDiscountService.calculateTicketPriceForMonday(client);
         Assertions.assertEquals(8, price, 0.001);
     }
 
     @Test
-    @DisplayName("calculateTicketPriceForMonday should return 4.95 for child, 5.4 for elder, 7.2 for student and 5,2 for student with card")
+    @DisplayName("""
+            calculateTicketPriceForMonday should return:
+             4.95 for child;
+             5.4 for elder;
+             7.2 for student;
+             5.2 for student with card;
+            """)
     public void calculateTicketPriceForMonday_Should_Return_Expected_Price_With_Discount() {
-        Client client = createClientWithNoneProfile();
+        var client = createClientMock();
         double price;
 
-        setClientProfileToChild(client);
+        client.setProfile(ClientProfile.CHILD);
         price = ticketDiscountService.calculateTicketPriceForMonday(client);
         Assertions.assertEquals(4.95, price, 0.001);
 
-        setClientProfileToElder(client);
+        client.setProfile(ClientProfile.ELDER);
         price = ticketDiscountService.calculateTicketPriceForMonday(client);
         Assertions.assertEquals(5.4, price, 0.001);
 
-        setClientProfileToStudent(client);
+        client.setProfile(ClientProfile.STUDENT);
         price = ticketDiscountService.calculateTicketPriceForMonday(client);
         Assertions.assertEquals(7.2, price, 0.001);
 
-        setClientProfileToStudentWithCard(client);
+        client.setProfile(ClientProfile.STUDENT_WITH_CARD);
         price = ticketDiscountService.calculateTicketPriceForMonday(client);
         Assertions.assertEquals(5.2, price, 0.001);
     }
@@ -80,31 +84,35 @@ public class TicketDiscountServiceImplTest {
     @Test
     @DisplayName("calculateTicketPriceForTuesday should return 8 if client has no discount")
     public void calculateTicketPriceForTuesday_Should_Return_Eight_If_Client_Has_No_Discount() {
-        Client client = createClientWithNoneProfile();
-        double price = ticketDiscountService.calculateTicketPriceForMonday(client);
-
+        var client = createClientMock();
+        var price = ticketDiscountService.calculateTicketPriceForMonday(client);
         Assertions.assertEquals(8, price, 0.001);
     }
 
     @Test
-    @DisplayName("calculateTicketPriceForTuesday should return 4.675 for child, 5.1 for elder, 7.6 for student and 5,2 for student with card")
+    @DisplayName("""
+            calculateTicketPriceForTuesday should return:
+             4.675 for child;
+             5.1 for elder;
+             7.6 for student;
+             5.2 for student with card""")
     public void calculateTicketPriceForTuesday_Should_Return_Expected_Price_With_Discount() {
-        Client client = createClientWithNoneProfile();
+        var client = createClientMock();
         double price;
 
-        setClientProfileToChild(client);
+        client.setProfile(ClientProfile.CHILD);
         price = ticketDiscountService.calculateTicketPriceForTuesday(client);
         Assertions.assertEquals(4.675, price, 0.001);
 
-        setClientProfileToElder(client);
+        client.setProfile(ClientProfile.ELDER);
         price = ticketDiscountService.calculateTicketPriceForTuesday(client);
         Assertions.assertEquals(5.1, price, 0.001);
 
-        setClientProfileToStudent(client);
+        client.setProfile(ClientProfile.STUDENT);
         price = ticketDiscountService.calculateTicketPriceForTuesday(client);
         Assertions.assertEquals(7.6, price, 0.001);
 
-        setClientProfileToStudentWithCard(client);
+        client.setProfile(ClientProfile.STUDENT_WITH_CARD);
         price = ticketDiscountService.calculateTicketPriceForTuesday(client);
         Assertions.assertEquals(5.2, price, 0.001);
     }
@@ -112,31 +120,35 @@ public class TicketDiscountServiceImplTest {
     @Test
     @DisplayName("calculateTicketPriceForWednesday should return 8 if client has no discount")
     public void calculateTicketPriceForWednesday_Should_Return_Eight_If_Client_Has_No_Discount() {
-        Client client = createClientWithNoneProfile();
-        double price = ticketDiscountService.calculateTicketPriceForMonday(client);
-
+        var client = createClientMock();
+        var price = ticketDiscountService.calculateTicketPriceForMonday(client);
         Assertions.assertEquals(8, price, 0.001);
     }
 
     @Test
-    @DisplayName("calculateTicketPriceForWednesday should return 3.85 for child, 3.6 for elder, 4 for student and 4 for student with card")
+    @DisplayName("""
+            calculateTicketPriceForWednesday should return:
+             3.85 for child;
+             3.6 for elder;
+             4 for student;
+             4 for student with card""")
     public void calculateTicketPriceForWednesday_Should_Return_Expected_Price_With_Discount() {
-        Client client = createClientWithNoneProfile();
+        var client = createClientMock();
         double price;
 
-        setClientProfileToChild(client);
+        client.setProfile(ClientProfile.CHILD);
         price = ticketDiscountService.calculateTicketPriceForWednesday(client);
         Assertions.assertEquals(3.85, price, 0.001);
 
-        setClientProfileToElder(client);
+        client.setProfile(ClientProfile.ELDER);
         price = ticketDiscountService.calculateTicketPriceForWednesday(client);
         Assertions.assertEquals(3.6, price, 0.001);
 
-        setClientProfileToStudent(client);
+        client.setProfile(ClientProfile.STUDENT);
         price = ticketDiscountService.calculateTicketPriceForWednesday(client);
         Assertions.assertEquals(4, price, 0.001);
 
-        setClientProfileToStudentWithCard(client);
+        client.setProfile(ClientProfile.STUDENT_WITH_CARD);
         price = ticketDiscountService.calculateTicketPriceForWednesday(client);
         Assertions.assertEquals(4, price, 0.001);
     }
@@ -144,63 +156,71 @@ public class TicketDiscountServiceImplTest {
     @Test
     @DisplayName("calculateTicketPriceForThursday should return 8 if client has no discount")
     public void calculateTicketPriceForThursday_Should_Return_Eight_If_Client_Has_No_Discount() {
-        Client client = createClientWithNoneProfile();
-        double price = ticketDiscountService.calculateTicketPriceForMonday(client);
-
+        var client = createClientMock();
+        var price = ticketDiscountService.calculateTicketPriceForMonday(client);
         Assertions.assertEquals(8, price, 0.001);
     }
 
     @Test
-    @DisplayName("calculateTicketPriceForThursday should return 5.5 for child, 4.2 for elder, 5.6 for student and 5.2 for student with card")
+    @DisplayName("""
+            calculateTicketPriceForThursday should return:
+             5.5 for child;
+             4.2 for elder;
+             5.6 for student;
+             5.2 for student with card""")
     public void calculateTicketPriceForThursday_Should_Return_Expected_Price_With_Discount() {
-        Client client = createClientWithNoneProfile();
+        var client = createClientMock();
         double price;
 
-        setClientProfileToChild(client);
+        client.setProfile(ClientProfile.CHILD);
         price = ticketDiscountService.calculateTicketPriceForThursday(client);
         Assertions.assertEquals(5.5, price, 0.001);
 
-        setClientProfileToElder(client);
+        client.setProfile(ClientProfile.ELDER);
         price = ticketDiscountService.calculateTicketPriceForThursday(client);
         Assertions.assertEquals(4.2, price, 0.001);
 
-        setClientProfileToStudent(client);
+        client.setProfile(ClientProfile.STUDENT);
         price = ticketDiscountService.calculateTicketPriceForThursday(client);
         Assertions.assertEquals(5.6, price, 0.001);
 
-        setClientProfileToStudentWithCard(client);
+        client.setProfile(ClientProfile.STUDENT_WITH_CARD);
         price = ticketDiscountService.calculateTicketPriceForThursday(client);
         Assertions.assertEquals(5.2, price, 0.001);
     }
 
     @Test
-    @DisplayName("calculateTicketPriceForThursday should return 8 if client has no discount")
+    @DisplayName("calculateTicketPriceForFriday should return 8 if client has no discount")
     public void calculateTicketPriceForFriday_Should_Return_Eight_If_Client_Has_No_Discount() {
-        Client client = createClientWithNoneProfile();
-        double price = ticketDiscountService.calculateTicketPriceForMonday(client);
-
+        var client = createClientMock();
+        var price = ticketDiscountService.calculateTicketPriceForMonday(client);
         Assertions.assertEquals(8, price, 0.001);
     }
 
     @Test
-    @DisplayName("calculateTicketPriceForFriday should return 4.895 for child, 6 for elder, 8 for student and 5.2 for student with card")
+    @DisplayName("""
+            calculateTicketPriceForFriday should return:
+             4.895 for child;
+             6 for elder;
+             8 for student;
+             5.2 for student with card""")
     public void calculateTicketPriceForFriday_Should_Return_Expected_Price_With_Discount() {
-        Client client = createClientWithNoneProfile();
+        var client = createClientMock();
         double price;
 
-        setClientProfileToChild(client);
+        client.setProfile(ClientProfile.CHILD);
         price = ticketDiscountService.calculateTicketPriceForFriday(client);
         Assertions.assertEquals(4.895, price, 0.001);
 
-        setClientProfileToElder(client);
+        client.setProfile(ClientProfile.ELDER);
         price = ticketDiscountService.calculateTicketPriceForFriday(client);
         Assertions.assertEquals(6, price, 0.001);
 
-        setClientProfileToStudent(client);
+        client.setProfile(ClientProfile.STUDENT);
         price = ticketDiscountService.calculateTicketPriceForFriday(client);
         Assertions.assertEquals(8, price, 0.001);
 
-        setClientProfileToStudentWithCard(client);
+        client.setProfile(ClientProfile.STUDENT_WITH_CARD);
         price = ticketDiscountService.calculateTicketPriceForFriday(client);
         Assertions.assertEquals(5.2, price, 0.001);
     }

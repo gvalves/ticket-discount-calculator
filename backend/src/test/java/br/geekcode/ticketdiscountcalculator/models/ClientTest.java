@@ -1,5 +1,6 @@
 package br.geekcode.ticketdiscountcalculator.models;
 
+import br.geekcode.ticketdiscountcalculator.models.client.Client;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

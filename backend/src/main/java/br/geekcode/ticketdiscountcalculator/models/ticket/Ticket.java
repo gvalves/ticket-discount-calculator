@@ -1,8 +1,15 @@
-package br.geekcode.ticketdiscountcalculator.models;
+package br.geekcode.ticketdiscountcalculator.models.ticket;
+
+import br.geekcode.ticketdiscountcalculator.models.client.Client;
 
 public class Ticket {
     private Client owner;
     private double price;
+
+    public static Ticket create() {
+        var ticket = new Ticket();
+        return ticket;
+    }
 
     public Client getOwner() {
         return owner;

@@ -1,22 +1,22 @@
-package br.geekcode.ticketdiscountcalculator.dtos;
+package br.geekcode.ticketdiscountcalculator.controllers.ticket.dtos;
 
-import br.geekcode.ticketdiscountcalculator.models.Client;
+import br.geekcode.ticketdiscountcalculator.dtos.ClientDto;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;
 
-public class TicketDto {
+public class ReqTicketDto {
     @NotNull
-    private Client owner;
+    private ClientDto owner;
     @FutureOrPresent
     private LocalDate scheduleDay;
 
-    public Client getOwner() {
+    public ClientDto getOwner() {
         return owner;
     }
 
-    public void setOwner(Client owner) {
+    public void setOwner(ClientDto owner) {
         this.owner = owner;
     }
 

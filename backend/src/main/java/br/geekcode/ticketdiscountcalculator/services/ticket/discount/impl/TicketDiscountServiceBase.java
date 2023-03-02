@@ -1,16 +1,16 @@
-package br.geekcode.ticketdiscountcalculator.services.impl;
+package br.geekcode.ticketdiscountcalculator.services.ticket.discount.impl;
 
-import br.geekcode.ticketdiscountcalculator.enums.ClientProfiles;
-import br.geekcode.ticketdiscountcalculator.models.Client;
-import br.geekcode.ticketdiscountcalculator.services.TicketDiscountService;
+import br.geekcode.ticketdiscountcalculator.enums.ClientProfile;
+import br.geekcode.ticketdiscountcalculator.models.client.Client;
+import br.geekcode.ticketdiscountcalculator.services.ticket.discount.TicketDiscountService;
 import org.springframework.stereotype.Service;
 
 import java.time.DayOfWeek;
 
 @Service
-public class TicketDiscountServiceImpl implements TicketDiscountService {
+public class TicketDiscountServiceBase implements TicketDiscountService {
     /*
-    * Método que recebe um dia da semana e utiliza o calculo para o respectivo dia
+    * Método que recebe um dia da semana e utiliza o cálculo para o respetivo dia
     * */
     public double calculateTicketPrice(Client client, DayOfWeek day) {
         return switch (day) {
@@ -30,10 +30,13 @@ public class TicketDiscountServiceImpl implements TicketDiscountService {
      * 35% para estudante com carterinha
      * */
     public double calculateTicketPriceForMonday(Client client) {
-        ClientProfiles profile = ClientProfiles.fromClient(client);
-        double ticketPrice = profile.getTicketPrice();
+        return calculateTicketPriceForMonday(client.getProfile());
+    }
 
-        double discountModifier = switch (profile) {
+    public double calculateTicketPriceForMonday(ClientProfile profile) {
+        var ticketPrice = profile.getTicketPrice();
+
+        var discountModifier = switch (profile) {
             case STUDENT_WITH_CARD -> 0.65;
             case NONE -> 1;
             default -> 0.9;
@@ -50,8 +53,11 @@ public class TicketDiscountServiceImpl implements TicketDiscountService {
      * 35% para estudante com carterinha
      * */
     public double calculateTicketPriceForTuesday(Client client) {
-        ClientProfiles profile = ClientProfiles.fromClient(client);
-        double ticketPrice = profile.getTicketPrice();
+        return calculateTicketPriceForTuesday(client.getProfile());
+    }
+
+    public double calculateTicketPriceForTuesday(ClientProfile profile) {
+        var ticketPrice = profile.getTicketPrice();
 
         double discountModifier = switch (profile) {
             case CHILD, ELDER -> 0.85;
@@ -71,8 +77,11 @@ public class TicketDiscountServiceImpl implements TicketDiscountService {
     * 40% para idoso
     * */
     public double calculateTicketPriceForWednesday(Client client) {
-        ClientProfiles profile = ClientProfiles.fromClient(client);
-        double ticketPrice = profile.getTicketPrice();
+        return calculateTicketPriceForWednesday(client.getProfile());
+    }
+
+    public double calculateTicketPriceForWednesday(ClientProfile profile) {
+        var ticketPrice = profile.getTicketPrice();
 
         double discountModifier = switch (profile) {
             case CHILD -> 0.70;
@@ -91,8 +100,11 @@ public class TicketDiscountServiceImpl implements TicketDiscountService {
      * 35% para estudante com carterinha
      * */
     public double calculateTicketPriceForThursday(Client client) {
-        ClientProfiles profile = ClientProfiles.fromClient(client);
-        double ticketPrice = profile.getTicketPrice();
+        return calculateTicketPriceForThursday(client.getProfile());
+    }
+
+    public double calculateTicketPriceForThursday(ClientProfile profile) {
+        var ticketPrice = profile.getTicketPrice();
 
         double discountModifier = switch (profile) {
             case ELDER, STUDENT -> 0.7;
@@ -110,8 +122,11 @@ public class TicketDiscountServiceImpl implements TicketDiscountService {
      * 35% para estudante com carterinha
      * */
     public double calculateTicketPriceForFriday(Client client) {
-        ClientProfiles profile = ClientProfiles.fromClient(client);
-        double ticketPrice = profile.getTicketPrice();
+        return calculateTicketPriceForFriday(client.getProfile());
+    }
+
+    public double calculateTicketPriceForFriday(ClientProfile profile) {
+        var ticketPrice = profile.getTicketPrice();
 
         double discountModifier = switch (profile) {
             case CHILD -> 0.89;
@@ -128,8 +143,11 @@ public class TicketDiscountServiceImpl implements TicketDiscountService {
      * 5% para idoso
      * */
     public double calculateTicketPriceForWeekendAndHoliday(Client client) {
-        ClientProfiles profile = ClientProfiles.fromClient(client);
-        double ticketPrice = profile.getTicketPrice();
+        return calculateTicketPriceForWeekendAndHoliday(client.getProfile());
+    }
+
+    public double calculateTicketPriceForWeekendAndHoliday(ClientProfile profile) {
+        var ticketPrice = profile.getTicketPrice();
 
         double discountModifier = switch (profile) {
             case ELDER -> 0.95;

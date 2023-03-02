@@ -1,23 +1,18 @@
-package br.geekcode.ticketdiscountcalculator.models;
+package br.geekcode.ticketdiscountcalculator.dtos;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Past;
 
 import java.time.LocalDate;
-import java.time.Period;
 
-public class Client {
+public class ClientDto {
     @NotBlank
     private String name;
     @Past
     private LocalDate birthday;
     private boolean student;
     private boolean studentCard;
-
-    public int getAge() {
-        LocalDate now = LocalDate.now();
-        return Period.between(birthday, now).getYears();
-    }
+    private boolean elderCard;
 
     public String getName() {
         return name;
@@ -49,5 +44,13 @@ public class Client {
 
     public void setStudentCard(boolean studentCard) {
         this.studentCard = studentCard;
+    }
+
+    public boolean isElderCard() {
+        return elderCard;
+    }
+
+    public void setElderCard(boolean elderCard) {
+        this.elderCard = elderCard;
     }
 }
