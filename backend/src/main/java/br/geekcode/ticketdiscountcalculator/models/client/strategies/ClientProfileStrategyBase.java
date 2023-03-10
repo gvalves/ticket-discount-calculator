@@ -3,20 +3,23 @@ package br.geekcode.ticketdiscountcalculator.models.client.strategies;
 import br.geekcode.ticketdiscountcalculator.dtos.ClientDto;
 import br.geekcode.ticketdiscountcalculator.enums.ClientProfile;
 import br.geekcode.ticketdiscountcalculator.models.client.Client;
+import br.geekcode.ticketdiscountcalculator.models.client.ClientProfileHandler;
 import br.geekcode.ticketdiscountcalculator.models.client.ClientProfileStrategy;
+import br.geekcode.ticketdiscountcalculator.models.client.handlers.ClientProfileChildHandler;
+import br.geekcode.ticketdiscountcalculator.models.client.handlers.ClientProfileElderHandler;
+import br.geekcode.ticketdiscountcalculator.models.client.handlers.ClientProfileStudentCardHandler;
 import org.springframework.stereotype.Component;
 
 @Component
 public class ClientProfileStrategyBase implements ClientProfileStrategy {
     public ClientProfile getClientProfile(Client client, ClientDto clientDto) {
-        if (client.getAge() <= 10) return ClientProfile.CHILD;
-        if (client.getAge() >= 60) return ClientProfile.ELDER;
+        var handler = ClientProfileHandler.create();
 
-        if (clientDto.isStudent()) {
-            if (clientDto.isStudentCard()) return ClientProfile.STUDENT_WITH_CARD;
-            return ClientProfile.STUDENT;
-        }
+        handler
+                .use(ClientProfileChildHandler.class)
+                .use(ClientProfileElderHandler.class)
+                .use(ClientProfileStudentCardHandler.class);
 
-        return ClientProfile.NONE;
+        return handler.handle(client, clientDto);
     }
 }
